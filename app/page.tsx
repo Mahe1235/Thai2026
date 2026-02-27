@@ -12,9 +12,13 @@ import { fetchWeather, weatherInfo } from '@/lib/weather';
 import type { WeatherData } from '@/lib/weather';
 import { TRIP, FLIGHTS, ITINERARY_DAYS, TOTAL_CASH, MEMBERS } from '@/lib/constants';
 import { fmtBaht, getTripDay } from '@/lib/utils';
-import { Card } from '@/components/ui/card';
+
+/* shadcn components */
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const MEMBER_COLORS = ['#F5C842', '#00C9A7', '#FF7EB3', '#7C83FD', '#FF9A3C', '#4ECDC4', '#C471ED'];
 
@@ -37,17 +41,24 @@ function greeting() {
   return 'Good evening';
 }
 
-/* ── Section header (iOS grouped style) ── */
-function SectionHeader({ title, action }: { title: string; action?: { label: string; href: string } }) {
+/* ── Section wrapper ── */
+function Section({ label, action, children }: {
+  label: string;
+  action?: { label: string; href: string };
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex items-center justify-between mb-2 px-1">
-      <h2 className="text-[13px] font-medium text-muted-foreground">{title}</h2>
-      {action && (
-        <Link href={action.href} className="text-[13px] text-primary font-medium">
-          {action.label}
-        </Link>
-      )}
-    </div>
+    <section>
+      <div className="flex items-center justify-between mb-2 px-1">
+        <h2 className="text-[13px] font-medium text-muted-foreground">{label}</h2>
+        {action && (
+          <Button variant="link" size="sm" asChild className="h-auto p-0 text-[13px]">
+            <Link href={action.href}>{action.label}</Link>
+          </Button>
+        )}
+      </div>
+      {children}
+    </section>
   );
 }
 
@@ -59,7 +70,7 @@ const QUICK = [
   { href: '/places',    icon: MapPin,       label: 'Places',    sub: 'Map · saved spots',         bg: 'bg-sky-500/10',    fg: 'text-sky-400'    },
 ];
 
-/* ── Main Page ── */
+/* ━━━━━━━━━━━━━━━ Main Page ━━━━━━━━━━━━━━━ */
 export default function TodayPage() {
   const [now, setNow] = useState(() => new Date());
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -124,286 +135,304 @@ export default function TodayPage() {
 
       {/* ━━━ Countdown ━━━ */}
       {isPreTrip && diff && (
-        <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}>
-          <SectionHeader title="Departure" />
-          <Card>
-            <div className="py-6 px-4 flex justify-center gap-6">
-              {[
-                { v: pad(diff.d), u: 'days' },
-                { v: pad(diff.h), u: 'hrs' },
-                { v: pad(diff.m), u: 'min' },
-                { v: pad(diff.s), u: 'sec' },
-              ].map(({ v, u }) => (
-                <div key={u} className="flex flex-col items-center gap-1">
-                  <span className="font-mono text-[26px] font-bold leading-none tnum">{v}</span>
-                  <span className="text-[11px] text-muted-foreground uppercase tracking-wider">{u}</span>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}>
+          <Section label="Departure">
+            <Card>
+              <CardHeader className="items-center pb-1">
+                <CardDescription className="uppercase tracking-wider text-[11px]">Countdown</CardDescription>
+              </CardHeader>
+              <CardContent className="pb-5">
+                <div className="flex justify-center gap-6">
+                  {[
+                    { v: pad(diff.d), u: 'days' },
+                    { v: pad(diff.h), u: 'hrs' },
+                    { v: pad(diff.m), u: 'min' },
+                    { v: pad(diff.s), u: 'sec' },
+                  ].map(({ v, u }) => (
+                    <div key={u} className="flex flex-col items-center gap-1">
+                      <span className="font-mono text-[26px] font-bold leading-none tnum">{v}</span>
+                      <span className="text-[11px] text-muted-foreground uppercase tracking-wider">{u}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </Card>
-        </motion.section>
+              </CardContent>
+            </Card>
+          </Section>
+        </motion.div>
       )}
 
-      {/* ━━━ Up Next (during trip) ━━━ */}
+      {/* ━━━ Up Next ━━━ */}
       {tripDay && dayData && (() => {
         const nowStr = now.toTimeString().slice(0, 5);
         const upcoming = dayData.activities.filter(a => a.time >= nowStr);
         const next = upcoming[0];
         if (!next) return null;
         return (
-          <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}>
-            <SectionHeader title="Up Next" />
-            <Card>
-              <div className="p-4">
-                <div className="flex items-start gap-3">
-                  <span className="text-[22px] leading-none mt-0.5">{next.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-semibold">{next.label}</p>
-                    <p className="text-[13px] text-muted-foreground mt-0.5">
-                      {next.time}{next.note ? ` · ${next.note}` : ''}
-                    </p>
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}>
+            <Section label="Up Next">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-start gap-3">
+                    <span className="text-[22px] leading-none mt-0.5">{next.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-[15px]">{next.label}</CardTitle>
+                      <CardDescription className="mt-0.5">
+                        {next.time}{next.note ? ` · ${next.note}` : ''}
+                      </CardDescription>
+                    </div>
                   </div>
-                </div>
+                </CardHeader>
                 {upcoming[1] && (
-                  <>
-                    <Separator className="my-3" />
+                  <CardContent>
+                    <Separator className="mb-3" />
                     <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
                       <span>{upcoming[1].emoji}</span>
                       <span className="font-mono">{upcoming[1].time}</span>
                       <span className="opacity-40">·</span>
                       <span className="truncate">{upcoming[1].label}</span>
                     </div>
-                  </>
+                  </CardContent>
                 )}
-              </div>
-            </Card>
-          </motion.section>
+              </Card>
+            </Section>
+          </motion.div>
         );
       })()}
 
       {/* ━━━ Weather ━━━ */}
-      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}>
-        <SectionHeader title="Weather" />
-        {weather ? (() => {
-          const info = weatherInfo(weather.code);
-          return (
-            <Card>
-              <div className="p-4 flex items-center gap-4">
-                <span className="text-[28px] leading-none shrink-0">{info.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-[17px] font-bold">{weather.temp}°C</span>
-                    <span className="text-[13px] text-muted-foreground">{info.label}</span>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}>
+        <Section label="Weather">
+          {weather ? (() => {
+            const info = weatherInfo(weather.code);
+            return (
+              <Card>
+                <CardContent className="pt-4">
+                  <div className="flex items-center gap-4">
+                    <span className="text-[28px] leading-none shrink-0">{info.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-mono text-[17px] font-bold">{weather.temp}°C</span>
+                        <CardDescription>{info.label}</CardDescription>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-muted-foreground">
+                        <span className="flex items-center gap-1"><Droplets size={11} /> {weather.humidity}%</span>
+                        <span className="flex items-center gap-1"><Wind size={11} /> {weather.windSpeed} km/h</span>
+                        <span className="flex items-center gap-1"><MapPin size={11} /> {weather.location}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 mt-1.5 text-[11px] text-muted-foreground">
-                    <span className="flex items-center gap-1"><Droplets size={11} /> {weather.humidity}%</span>
-                    <span className="flex items-center gap-1"><Wind size={11} /> {weather.windSpeed} km/h</span>
-                    <span className="flex items-center gap-1"><MapPin size={11} /> {weather.location}</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          );
-        })() : (
-          <div className="skeleton h-[72px] rounded-xl" />
-        )}
-      </motion.section>
+                </CardContent>
+              </Card>
+            );
+          })() : (
+            <div className="skeleton h-[72px] rounded-xl" />
+          )}
+        </Section>
+      </motion.div>
 
       {/* ━━━ Money ━━━ */}
-      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
-        <SectionHeader title="Money" action={{ label: 'Details', href: '/expenses' }} />
-        <Link href="/expenses" className="block active:opacity-70 transition-opacity">
-          <Card>
-            <div className="p-4">
-
-              {/* Hero */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5">Pool remaining</p>
-                  {stats
-                    ? <p className="font-mono text-[22px] font-bold text-teal leading-none">{fmtBaht(stats.remaining)}</p>
-                    : <div className="skeleton h-6 w-28 rounded" />
-                  }
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
+        <Section label="Money" action={{ label: 'Details', href: '/expenses' }}>
+          <Link href="/expenses" className="block active:opacity-70 transition-opacity">
+            <Card>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardDescription className="uppercase tracking-wider text-[11px]">Pool remaining</CardDescription>
+                    {stats
+                      ? <CardTitle className="font-mono text-[22px] text-teal mt-1.5">{fmtBaht(stats.remaining)}</CardTitle>
+                      : <div className="skeleton h-6 w-28 rounded mt-1.5" />
+                    }
+                  </div>
+                  <Badge variant="outline" className="text-[11px] text-teal border-teal/20 font-mono">
+                    {stats ? `${poolPct}%` : '···'}
+                  </Badge>
                 </div>
-                <Badge variant="outline" className="text-[11px] text-teal border-teal/20 font-mono mt-3">
-                  {stats ? `${poolPct}%` : '···'}
-                </Badge>
-              </div>
-
-              {/* Progress */}
-              <div className="mt-4 h-[6px] bg-white/[0.04] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{ width: `${poolPct}%`, background: 'linear-gradient(90deg, #2DD4BF, #0EA5E9)' }}
-                />
-              </div>
-
-              <Separator className="my-4" />
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 text-center">
-                <div>
-                  <p className="text-[11px] text-muted-foreground mb-1">Total</p>
-                  <p className="font-mono text-[13px] font-semibold">{fmtBaht(TOTAL_CASH)}</p>
+              </CardHeader>
+              <CardContent>
+                {/* Progress bar */}
+                <div className="h-[6px] bg-white/[0.04] rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{ width: `${poolPct}%`, background: 'linear-gradient(90deg, #2DD4BF, #0EA5E9)' }}
+                  />
                 </div>
-                <div className="border-x border-border/50">
-                  <p className="text-[11px] text-muted-foreground mb-1">Spent</p>
-                  <p className={`font-mono text-[13px] font-semibold ${stats?.spent ? 'text-primary' : ''}`}>
-                    {stats ? fmtBaht(stats.spent) : '—'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] text-muted-foreground mb-1">Split</p>
-                  <p className="font-mono text-[13px] font-semibold">
-                    {stats ? fmtBaht(stats.splitTotal) : '—'}
-                  </p>
-                </div>
-              </div>
 
-            </div>
-          </Card>
-        </Link>
-      </motion.section>
+                <Separator className="my-4" />
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 text-center">
+                  <div>
+                    <CardDescription className="text-[11px] mb-1">Total</CardDescription>
+                    <p className="font-mono text-[13px] font-semibold">{fmtBaht(TOTAL_CASH)}</p>
+                  </div>
+                  <div className="border-x border-border/50">
+                    <CardDescription className="text-[11px] mb-1">Spent</CardDescription>
+                    <p className={`font-mono text-[13px] font-semibold ${stats?.spent ? 'text-primary' : ''}`}>
+                      {stats ? fmtBaht(stats.spent) : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <CardDescription className="text-[11px] mb-1">Split</CardDescription>
+                    <p className="font-mono text-[13px] font-semibold">
+                      {stats ? fmtBaht(stats.splitTotal) : '—'}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        </Section>
+      </motion.div>
 
       {/* ━━━ Flight ━━━ */}
       {nextFlight && !isPostTrip && (
-        <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <SectionHeader title={isPreTrip ? 'First Flight' : 'Next Flight'} />
-          <a href={nextFlight.fr24} target="_blank" rel="noopener noreferrer" className="block active:opacity-70 transition-opacity">
-            <Card>
-              <div className="p-4">
-
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-                      <Plane size={14} className="text-amber-400" />
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Section label={isPreTrip ? 'First Flight' : 'Next Flight'}>
+            <a href={nextFlight.fr24} target="_blank" rel="noopener noreferrer" className="block active:opacity-70 transition-opacity">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+                        <Plane size={14} className="text-amber-400" />
+                      </div>
+                      <div>
+                        <CardTitle className="font-mono text-[15px] text-primary">{nextFlight.flight}</CardTitle>
+                        <CardDescription className="mt-0.5">{nextFlight.airline}</CardDescription>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-mono text-[15px] font-bold text-primary leading-none">{nextFlight.flight}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{nextFlight.airline}</p>
+                    <Badge variant="outline" className="text-[10px] text-teal border-teal/20">Track ↗</Badge>
+                  </div>
+                </CardHeader>
+
+                <CardContent>
+                  <Separator className="mb-4" />
+
+                  {/* Route */}
+                  <div className="flex items-center">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-mono text-[20px] font-bold leading-none">{nextFlight.from}</p>
+                      <CardDescription className="mt-1.5 truncate">{nextFlight.fromFull}</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 shrink-0">
+                      <div className="w-5 h-px bg-border" />
+                      <ArrowRight size={12} className="text-muted-foreground shrink-0" />
+                      <div className="w-5 h-px bg-border" />
+                    </div>
+                    <div className="flex-1 min-w-0 text-right">
+                      <p className="font-mono text-[20px] font-bold leading-none">{nextFlight.to}</p>
+                      <CardDescription className="mt-1.5 truncate">{nextFlight.toFull}</CardDescription>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-[10px] text-teal border-teal/20">Track ↗</Badge>
-                </div>
 
-                <Separator className="my-4" />
+                  <Separator className="my-4" />
 
-                {/* Route */}
-                <div className="flex items-center">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-mono text-[20px] font-bold leading-none">{nextFlight.from}</p>
-                    <p className="text-[11px] text-muted-foreground mt-1.5 truncate">{nextFlight.fromFull}</p>
+                  {/* Details */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1">
+                    <CardDescription>{nextFlight.depLocal} → {nextFlight.arrLocal.split(', ')[1]}</CardDescription>
+                    <CardDescription>PNR {nextFlight.pnr}</CardDescription>
                   </div>
-                  <div className="flex items-center gap-2 px-4 shrink-0">
-                    <div className="w-5 h-px bg-border" />
-                    <ArrowRight size={12} className="text-muted-foreground shrink-0" />
-                    <div className="w-5 h-px bg-border" />
-                  </div>
-                  <div className="flex-1 min-w-0 text-right">
-                    <p className="font-mono text-[20px] font-bold leading-none">{nextFlight.to}</p>
-                    <p className="text-[11px] text-muted-foreground mt-1.5 truncate">{nextFlight.toFull}</p>
-                  </div>
-                </div>
-
-                <Separator className="my-4" />
-
-                {/* Info */}
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted-foreground">
-                  <span>{nextFlight.depLocal} → {nextFlight.arrLocal.split(', ')[1]}</span>
-                  <span>PNR {nextFlight.pnr}</span>
-                </div>
-                {nextFlight.note && <p className="mt-2 text-[13px] text-teal/70">{nextFlight.note}</p>}
-                {'warn' in nextFlight && nextFlight.warn && (
-                  <p className="mt-2 text-[13px] text-destructive/70">{nextFlight.warn}</p>
-                )}
-
-              </div>
-            </Card>
-          </a>
-        </motion.section>
+                  {nextFlight.note && <p className="mt-2 text-[13px] text-teal/70">{nextFlight.note}</p>}
+                  {'warn' in nextFlight && nextFlight.warn && (
+                    <p className="mt-2 text-[13px] text-destructive/70">{nextFlight.warn}</p>
+                  )}
+                </CardContent>
+              </Card>
+            </a>
+          </Section>
+        </motion.div>
       )}
 
-      {/* ━━━ Today's Schedule ━━━ */}
+      {/* ━━━ Schedule ━━━ */}
       {tripDay && dayData && (
-        <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
-          <SectionHeader title="Schedule" action={{ label: 'Full Plan', href: '/itinerary' }} />
-          <Card>
-            {dayData.activities.map((act, i) => {
-              const past = act.time < now.toTimeString().slice(0, 5);
-              return (
-                <div key={i}>
-                  {i > 0 && <Separator className="mx-4" />}
-                  <div className="flex items-start gap-3 px-4 py-3 min-h-[44px]">
-                    <span className="font-mono text-[11px] text-muted-foreground w-10 pt-0.5 shrink-0">{act.time}</span>
-                    <span className="text-[17px] leading-none shrink-0 mt-px">{act.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-[15px] leading-snug ${past ? 'text-muted-foreground line-through' : ''}`}>
-                        {act.label}
-                      </p>
-                      {act.note && <p className="text-[11px] text-muted-foreground mt-0.5">{act.note}</p>}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+          <Section label="Schedule" action={{ label: 'Full Plan', href: '/itinerary' }}>
+            <Card>
+              {dayData.activities.map((act, i) => {
+                const past = act.time < now.toTimeString().slice(0, 5);
+                return (
+                  <div key={i}>
+                    {i > 0 && <Separator className="mx-4" />}
+                    <div className="flex items-start gap-3 px-4 py-3 min-h-[44px]">
+                      <span className="font-mono text-[11px] text-muted-foreground w-10 pt-0.5 shrink-0">{act.time}</span>
+                      <span className="text-[17px] leading-none shrink-0 mt-px">{act.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[15px] leading-snug ${past ? 'text-muted-foreground line-through' : ''}`}>
+                          {act.label}
+                        </p>
+                        {act.note && <CardDescription className="mt-0.5 text-[11px]">{act.note}</CardDescription>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </Card>
-        </motion.section>
+                );
+              })}
+            </Card>
+          </Section>
+        </motion.div>
       )}
 
       {/* ━━━ Post-trip Settlement ━━━ */}
       {isPostTrip && (
-        <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="border border-primary/20">
-            <div className="p-4 space-y-3">
-              <p className="text-[15px] font-semibold">Time to settle up!</p>
-              <p className="text-[13px] text-muted-foreground">See who owes who and close it out.</p>
-              <Link
-                href="/expenses"
-                className="flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold text-[15px] rounded-xl py-3 w-full"
-              >
-                <ReceiptText size={15} /> View Balances
-              </Link>
-            </div>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-[15px]">Time to settle up!</CardTitle>
+              <CardDescription>See who owes who and close it out.</CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button asChild className="w-full rounded-xl h-11 text-[15px]">
+                <Link href="/expenses">
+                  <ReceiptText size={15} />
+                  View Balances
+                </Link>
+              </Button>
+            </CardFooter>
           </Card>
-        </motion.section>
+        </motion.div>
       )}
 
       {/* ━━━ Quick Access ━━━ */}
-      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>
-        <SectionHeader title="Quick Access" />
-        <div className="grid grid-cols-2 gap-3">
-          {QUICK.map(({ href, icon: Icon, label, sub, bg, fg }) => (
-            <Link key={href} href={href} className="block active:opacity-70 transition-opacity">
-              <Card className="p-4 h-full">
-                <div className={`w-9 h-9 rounded-lg ${bg} flex items-center justify-center mb-3`}>
-                  <Icon size={17} className={fg} />
-                </div>
-                <p className="text-[15px] font-semibold leading-tight">{label}</p>
-                <p className="text-[11px] text-muted-foreground mt-1 leading-snug">{sub}</p>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </motion.section>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>
+        <Section label="Quick Access">
+          <div className="grid grid-cols-2 gap-3">
+            {QUICK.map(({ href, icon: Icon, label, sub, bg, fg }) => (
+              <Link key={href} href={href} className="block active:opacity-70 transition-opacity">
+                <Card className="h-full">
+                  <CardHeader>
+                    <div className={`w-9 h-9 rounded-lg ${bg} flex items-center justify-center mb-1`}>
+                      <Icon size={17} className={fg} />
+                    </div>
+                    <CardTitle className="text-[15px]">{label}</CardTitle>
+                    <CardDescription>{sub}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </Section>
+      </motion.div>
 
       {/* ━━━ Crew ━━━ */}
-      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.18 }}>
-        <SectionHeader title={`Crew · ${MEMBERS.length}`} />
-        <div className="flex gap-2 flex-wrap">
-          {MEMBERS.map((m, i) => (
-            <div key={m} className="flex items-center gap-2 rounded-full bg-card px-3 py-2">
-              <div
-                className="w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
-                style={{ background: `${MEMBER_COLORS[i]}15`, color: MEMBER_COLORS[i] }}
-              >
-                {m[0]}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.18 }}>
+        <Section label={`Crew · ${MEMBERS.length}`}>
+          <div className="flex gap-2.5 flex-wrap">
+            {MEMBERS.map((m, i) => (
+              <div key={m} className="flex items-center gap-2 rounded-full bg-card px-3 py-2">
+                <Avatar className="h-6 w-6">
+                  <AvatarFallback
+                    className="text-[10px] font-bold"
+                    style={{ background: `${MEMBER_COLORS[i]}15`, color: MEMBER_COLORS[i] }}
+                  >
+                    {m[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-[13px]">{m}</span>
               </div>
-              <span className="text-[13px]">{m}</span>
-            </div>
-          ))}
-        </div>
-      </motion.section>
+            ))}
+          </div>
+        </Section>
+      </motion.div>
 
     </div>
   );
