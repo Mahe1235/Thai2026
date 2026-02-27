@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   Plane, Wind, Droplets, CalendarDays, ReceiptText,
-  ChevronRight, MapPin, FolderOpen, ArrowRight,
+  ChevronRight, MapPin, FolderOpen,
 } from 'lucide-react';
 import { db } from '@/lib/supabase';
 import { fetchWeather, weatherInfo } from '@/lib/weather';
@@ -58,27 +58,6 @@ function WeatherPill({ w }: { w: WeatherData }) {
         </div>
       </div>
     </div>
-  );
-}
-
-/* ── Compact flight row ── */
-function FlightRow({ f }: { f: typeof FLIGHTS[number] }) {
-  const past = new Date(f.depUTC) < new Date();
-  return (
-    <a href={f.fr24} target="_blank" rel="noopener noreferrer"
-      className={`flex items-center gap-3 py-2.5 border-b border-border last:border-0 ${past ? 'opacity-40' : ''}`}
-    >
-      <div className="w-16">
-        <span className="font-mono text-xs font-bold text-gold">{f.flight}</span>
-      </div>
-      <div className="flex items-center gap-1.5 flex-1 text-sm">
-        <span className="font-semibold">{f.from}</span>
-        <ArrowRight size={12} className="text-muted shrink-0" />
-        <span className="font-semibold">{f.to}</span>
-      </div>
-      <span className="text-xs text-muted shrink-0">{f.depLocal.split(',')[0]}</span>
-      <span className="text-[10px] text-teal shrink-0">↗</span>
-    </a>
   );
 }
 
@@ -194,7 +173,7 @@ export default function TodayPage() {
       </div>
 
       {/* ═══ CONTENT ═══ */}
-      <div className="px-4 pt-4 space-y-4">
+      <div className="px-4 pt-5 space-y-5">
 
         {/* Weather */}
         {weather
@@ -220,7 +199,6 @@ export default function TodayPage() {
                   <p className="font-semibold text-sm">{next.label}</p>
                   <p className="text-xs text-muted mt-0.5">
                     {next.time}{next.note ? ` · ${next.note}` : ''}
-                    {'cost' in next && next.cost ? ` · ฿${next.cost.toLocaleString()}` : ''}
                   </p>
                 </div>
               </div>
@@ -239,7 +217,7 @@ export default function TodayPage() {
         {/* Quick stats */}
         <motion.div
           initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-          className="grid grid-cols-3 gap-2"
+          className="grid grid-cols-3 gap-3"
         >
           {[
             { label: 'Pool Left',  val: stats ? fmtBaht(stats.remaining) : null, color: 'text-teal'  },
@@ -302,20 +280,6 @@ export default function TodayPage() {
           </motion.div>
         )}
 
-        {/* Pre-trip: remaining flights (compact list) */}
-        {isPreTrip && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="bg-surface border border-border rounded-2xl px-4 overflow-hidden"
-          >
-            <div className="flex items-center justify-between py-3 border-b border-border">
-              <p className="text-[10px] text-muted uppercase tracking-widest">All flights</p>
-              <Link href="/docs" className="text-xs text-gold">Details →</Link>
-            </div>
-            {FLIGHTS.map(f => <FlightRow key={f.leg} f={f} />)}
-          </motion.div>
-        )}
-
         {/* Today's schedule (during trip) */}
         {tripDay && dayData && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
@@ -334,9 +298,6 @@ export default function TodayPage() {
                       <p className={`text-sm ${past ? 'text-muted line-through' : ''}`}>{act.label}</p>
                       {act.note && <p className="text-xs text-muted mt-0.5">{act.note}</p>}
                     </div>
-                    {'cost' in act && act.cost ? (
-                      <span className="text-xs text-muted font-mono shrink-0">฿{act.cost.toLocaleString()}</span>
-                    ) : null}
                   </div>
                 );
               })}
@@ -362,7 +323,7 @@ export default function TodayPage() {
         {/* Quick links grid */}
         <motion.div
           initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-          className="grid grid-cols-2 gap-2"
+          className="grid grid-cols-2 gap-3"
         >
           {[
             { href: '/itinerary', icon: CalendarDays, label: 'Itinerary',  sub: '5 days · Phuket & BKK' },
