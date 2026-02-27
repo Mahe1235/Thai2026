@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
-/* ── Custom theme ── */
+/* ── Midnight Luxury palette ── */
 @theme {
-  --color-bg:       #080B14;
-  --color-surface:  #111827;
-  --color-surface2: #1A2235;
-  --color-border:   #1E2D45;
-  --color-gold:     #F5C842;
-  --color-gold2:    #E8A800;
-  --color-teal:     #00C9A7;
-  --color-red:      #FF5F6D;
-  --color-muted:    #6B7280;
-  --color-text:     #E8EAF0;
+  --color-bg:       #09090B;   /* warm near-black (zinc-950) */
+  --color-surface:  #111113;   /* card surface */
+  --color-surface2: #1C1C1F;   /* elevated / nested */
+  --color-border:   #2C2C2E;   /* subtle warm zinc */
+  --color-gold:     #F59E0B;   /* warm amber-500 */
+  --color-gold2:    #D97706;   /* amber-600 */
+  --color-teal:     #2DD4BF;   /* teal-400 */
+  --color-red:      #F87171;   /* red-400 (softer) */
+  --color-muted:    #71717A;   /* zinc-500 */
+  --color-text:     #F4F4F5;   /* zinc-100 (warm white) */
 }
 
-/* ── Font vars from next/font (v4: --font-* not --font-family-*) ── */
+/* ── Font vars from next/font ── */
 @theme inline {
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-dm-mono), 'DM Mono', ui-monospace, monospace;
@@ -29,10 +29,6 @@
   from { background-position: -200% 0; }
   to   { background-position:  200% 0; }
 }
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
-}
 
 /* ── Base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,35 +40,36 @@ html {
 }
 
 body {
-  background-color: #080B14;
-  color: #E8EAF0;
+  background-color: #09090B;
+  color: #F4F4F5;
   min-height: 100dvh;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
+  font-feature-settings: 'cv11', 'ss01'; /* Inter optical improvements */
 }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1E2D45; border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: #3F3F46; border-radius: 99px; }
 
 /* ── Touch ── */
 button, a, [role="button"] { touch-action: manipulation; }
 
 /* ── Skeleton ── */
 .skeleton {
-  background: linear-gradient(90deg, #1A2235 25%, #1E2D45 50%, #1A2235 75%);
+  background: linear-gradient(90deg, #1C1C1F 25%, #2C2C2E 50%, #1C1C1F 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 6px;
 }
 
-/* ── Number animation ── */
+/* ── Tabular numbers ── */
 .cd-digit {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
 
-/* ── Hide scrollbar while keeping scroll ── */
+/* ── Hide scrollbar ── */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

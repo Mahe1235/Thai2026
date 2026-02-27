@@ -32,10 +32,10 @@ function pad(n: number) { return String(n).padStart(2, '0'); }
 function Digit({ val, label }: { val: string; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1.5">
-      <div className="bg-white/10 border border-white/20 rounded-xl w-16 h-16 flex items-center justify-center backdrop-blur-sm">
-        <span className="font-mono text-2xl font-bold text-gold cd-digit">{val}</span>
+      <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl w-[60px] h-[60px] flex items-center justify-center">
+        <span className="font-mono text-[26px] font-bold text-gold cd-digit leading-none">{val}</span>
       </div>
-      <span className="text-[10px] text-white/50 uppercase tracking-widest">{label}</span>
+      <span className="text-[9px] text-white/40 uppercase tracking-[0.12em]">{label}</span>
     </div>
   );
 }
@@ -107,12 +107,12 @@ export default function TodayPage() {
 
       {/* ═══ HERO ═══ */}
       <div
-        className="relative overflow-hidden px-5 pt-10 pb-8"
-        style={{ background: 'linear-gradient(160deg, #0f3460 0%, #16213e 45%, #080B14 100%)' }}
+        className="relative overflow-hidden px-5 pt-12 pb-9"
+        style={{ background: 'linear-gradient(165deg, #1A0F04 0%, #0D0D0B 55%, #09090B 100%)' }}
       >
-        {/* Subtle pattern overlay */}
-        <div className="absolute inset-0 opacity-5"
-          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M20 20L0 0h40zm0 0L40 40H0z'/%3E%3C/g%3E%3C/svg%3E\")" }}
+        {/* Subtle warm noise */}
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundSize: '300px 300px' }}
         />
 
         {/* Flag + title */}
@@ -120,13 +120,13 @@ export default function TodayPage() {
           {isPreTrip && (
             <>
               <div className="flex items-center gap-3 mb-1">
-                <span className="text-3xl">🇹🇭</span>
+                <span className="text-4xl">🇹🇭</span>
                 <div>
-                  <h1 className="text-2xl font-bold text-white tracking-tight">Thailand 2026</h1>
-                  <p className="text-xs text-white/50 tracking-widest uppercase">Feb 28 – Mar 4 · Group of 7</p>
+                  <h1 className="text-[28px] font-bold text-white tracking-tight leading-tight">Thailand 2026</h1>
+                  <p className="text-[11px] text-white/40 tracking-[0.12em] uppercase mt-0.5">Feb 28 – Mar 4 · Group of 7</p>
                 </div>
               </div>
-              <p className="text-sm text-white/70 mt-2 mb-6">
+              <p className="text-sm text-white/60 mt-3 mb-7">
                 {diff?.d === 0 ? '🛫 Today is flight day! Pack your bags.' :
                  diff?.d === 1 ? '✈️ Departing tomorrow night from BLR!' :
                  `${diff?.d} day${diff?.d !== 1 ? 's' : ''} until departure from BLR`}
@@ -158,14 +158,14 @@ export default function TodayPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.08 }}
           >
-            <p className="text-[10px] text-white/40 uppercase tracking-widest text-center mb-3">Countdown to departure</p>
-            <div className="flex justify-center gap-2.5">
+            <p className="text-[9px] text-white/30 uppercase tracking-[0.14em] text-center mb-4">Countdown to departure</p>
+            <div className="flex justify-center gap-3">
               <Digit val={pad(diff.d)} label="Days" />
-              <span className="font-mono text-2xl text-white/30 self-center mb-4">:</span>
+              <span className="font-mono text-xl text-white/20 self-center pb-5">:</span>
               <Digit val={pad(diff.h)} label="Hrs" />
-              <span className="font-mono text-2xl text-white/30 self-center mb-4">:</span>
+              <span className="font-mono text-xl text-white/20 self-center pb-5">:</span>
               <Digit val={pad(diff.m)} label="Min" />
-              <span className="font-mono text-2xl text-white/30 self-center mb-4">:</span>
+              <span className="font-mono text-xl text-white/20 self-center pb-5">:</span>
               <Digit val={pad(diff.s)} label="Sec" />
             </div>
           </motion.div>
@@ -225,13 +225,13 @@ export default function TodayPage() {
             { label: 'Split',      val: stats ? fmtBaht(stats.splitTotal): null, color: 'text-text'  },
           ].map(item => (
             <Link key={item.label} href="/expenses"
-              className="bg-surface border border-border rounded-xl p-3 text-center active:border-gold/50 transition-colors"
+              className="bg-surface border border-border rounded-2xl p-3.5 text-center hover:border-gold/20 active:border-gold/40 transition-colors"
             >
               {item.val
-                ? <div className={`font-mono text-base font-bold ${item.color}`}>{item.val}</div>
+                ? <div className={`font-mono text-[15px] font-bold ${item.color}`}>{item.val}</div>
                 : <div className="skeleton h-5 w-14 mx-auto rounded" />
               }
-              <div className="text-[10px] text-muted mt-0.5 uppercase tracking-wide">{item.label}</div>
+              <div className="text-[10px] text-muted mt-1 tracking-wide">{item.label}</div>
             </Link>
           ))}
         </motion.div>
@@ -332,7 +332,7 @@ export default function TodayPage() {
             { href: '/places',    icon: MapPin,        label: 'Places',     sub: 'Map · visited list' },
           ].map(({ href, icon: Icon, label, sub }) => (
             <Link key={href} href={href}
-              className="flex flex-col gap-1.5 bg-surface border border-border rounded-xl p-3.5 hover:border-gold/40 active:bg-surface2 transition-colors"
+              className="flex flex-col gap-2 bg-surface border border-border rounded-2xl p-4 hover:border-gold/25 active:bg-surface2 transition-colors"
             >
               <Icon size={18} className="text-gold" />
               <div>

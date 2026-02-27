@@ -17,8 +17,15 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 flex bg-surface/95 backdrop-blur-lg border-t border-border"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)', height: 'calc(4rem + env(safe-area-inset-bottom))' }}
+      className="fixed bottom-0 left-0 right-0 z-50 flex"
+      style={{
+        background: 'rgba(9,9,11,0.92)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        height: 'calc(4rem + env(safe-area-inset-bottom))',
+      }}
     >
       {TABS.map(({ href, icon: Icon, label }) => {
         const active = href === '/' ? path === '/' : path.startsWith(href);
@@ -26,23 +33,20 @@ export default function BottomNav() {
           <Link
             key={href}
             href={href}
-            className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2 relative"
+            className="flex flex-1 flex-col items-center justify-center gap-0.5 py-1 relative"
           >
-            {active && (
-              <span
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-b-full bg-gold"
+            <div className={`flex items-center justify-center w-11 h-7 rounded-2xl transition-all duration-200 ${
+              active ? 'bg-amber-500/12' : ''
+            }`}>
+              <Icon
+                size={20}
+                className={active ? 'text-gold' : 'text-muted'}
+                strokeWidth={active ? 2.2 : 1.7}
               />
-            )}
-            <Icon
-              size={21}
-              className={active ? 'text-gold' : 'text-muted'}
-              strokeWidth={active ? 2.5 : 1.8}
-            />
-            <span
-              className={`text-[10px] font-medium tracking-wide ${
-                active ? 'text-gold' : 'text-muted'
-              }`}
-            >
+            </div>
+            <span className={`text-[10px] tracking-wide transition-colors ${
+              active ? 'text-gold font-semibold' : 'text-muted font-medium'
+            }`}>
               {label}
             </span>
           </Link>

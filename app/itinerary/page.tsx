@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Clock, DollarSign } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { ITINERARY_DAYS } from '@/lib/constants';
 import { getTripDay } from '@/lib/utils';
 
@@ -27,7 +27,6 @@ export default function ItineraryPage() {
   const [activeDay, setActiveDay] = useState(todayTrip ?? 1);
 
   const day = ITINERARY_DAYS[activeDay - 1];
-  const totalCost = day.activities.reduce((s, a) => s + ('cost' in a && a.cost ? a.cost : 0), 0);
 
   return (
     <div className="max-w-lg mx-auto">
@@ -75,18 +74,10 @@ export default function ItineraryPage() {
         >
           {/* Day header */}
           <div className="bg-surface border border-border rounded-2xl p-4">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <h2 className="font-bold text-lg leading-tight">{day.title}</h2>
-                <p className="text-sm text-muted flex items-center gap-1 mt-0.5">
-                  <MapPin size={12} className="shrink-0" /> {day.location}
-                </p>
-              </div>
-              <div className="text-right shrink-0">
-                <div className="font-mono text-base font-bold text-gold">฿{totalCost.toLocaleString()}</div>
-                <div className="text-[10px] text-muted">per person est.</div>
-              </div>
-            </div>
+            <h2 className="font-bold text-lg leading-tight">{day.title}</h2>
+            <p className="text-sm text-muted flex items-center gap-1 mt-1">
+              <MapPin size={12} className="shrink-0" /> {day.location}
+            </p>
           </div>
 
           {/* Timeline */}
@@ -133,11 +124,6 @@ export default function ItineraryPage() {
                             )}
                           </div>
                         </div>
-                        {'cost' in act && act.cost ? (
-                          <span className="font-mono text-xs font-semibold shrink-0 flex items-center gap-0.5">
-                            <DollarSign size={10} />฿{act.cost.toLocaleString()}
-                          </span>
-                        ) : null}
                       </div>
                     </div>
                   </motion.div>
@@ -146,31 +132,6 @@ export default function ItineraryPage() {
             </div>
           </div>
 
-          {/* Cost summary */}
-          <div className="bg-surface border border-border rounded-2xl p-4 mb-2">
-            <p className="text-xs text-muted uppercase tracking-widest mb-3">Estimated costs for Day {day.day}</p>
-            <div className="space-y-2">
-              {day.activities
-                .filter(a => 'cost' in a && a.cost)
-                .map((a, i) => (
-                  <div key={i} className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-1.5">
-                      <span>{a.emoji}</span>
-                      <span className="text-muted">{a.label.split(' — ')[0]}</span>
-                    </span>
-                    <span className="font-mono text-xs">{'cost' in a && a.cost ? `฿${a.cost.toLocaleString()}` : ''}</span>
-                  </div>
-                ))}
-              <div className="flex items-center justify-between text-sm pt-2 border-t border-border">
-                <span className="font-semibold">Total per person</span>
-                <span className="font-mono font-bold text-gold">฿{totalCost.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs text-muted">
-                <span>Group of 7</span>
-                <span className="font-mono">฿{(totalCost * 7).toLocaleString()}</span>
-              </div>
-            </div>
-          </div>
 
         </motion.div>
       </AnimatePresence>
