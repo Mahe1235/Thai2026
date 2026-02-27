@@ -14,9 +14,9 @@
   /* Surface hierarchy */
   --background:           #09090B;
   --foreground:           #F4F4F5;
-  --card:                 #111113;
+  --card:                 #141418;
   --card-foreground:      #F4F4F5;
-  --popover:              #18181B;
+  --popover:              #1A1A1E;
   --popover-foreground:   #F4F4F5;
 
   /* Brand accent — warm amber */
@@ -24,13 +24,13 @@
   --primary-foreground:   #0C0C0E;
 
   /* Secondary / muted surfaces */
-  --secondary:            #1C1C1F;
+  --secondary:            #1E1E23;
   --secondary-foreground: #F4F4F5;
-  --muted:                #1C1C1F;
+  --muted:                #1E1E23;
   --muted-foreground:     #71717A;
 
   /* Hover accent surface */
-  --accent:               #27272A;
+  --accent:               #28282E;
   --accent-foreground:    #F4F4F5;
 
   /* Destructive */
@@ -38,8 +38,8 @@
   --destructive-foreground: #0C0C0E;
 
   /* Structure */
-  --border:               #27272A;
-  --input:                #27272A;
+  --border:               #2C2C33;
+  --input:                #2C2C33;
   --ring:                 #F59E0B;
 
   /* Data-vis palette */
