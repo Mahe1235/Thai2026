@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 const dmMono = DM_Mono({
-  variable: '--font-mono',
+  variable: '--font-dm-mono',
   subsets: ['latin'],
   weight: ['400', '500'],
   display: 'swap',

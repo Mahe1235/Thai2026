@@ -14,10 +14,10 @@
   --color-text:     #E8EAF0;
 }
 
-/* ── Font vars from next/font ── */
+/* ── Font vars from next/font (v4: --font-* not --font-family-*) ── */
 @theme inline {
-  --font-family-sans: var(--font-inter), system-ui, sans-serif;
-  --font-family-mono: var(--font-mono), monospace;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), 'DM Mono', ui-monospace, monospace;
 }
 
 /* ── Keyframes ── */
@@ -67,8 +67,12 @@ button, a, [role="button"] { touch-action: manipulation; }
   border-radius: 6px;
 }
 
-/* ── Number flip animation ── */
+/* ── Number animation ── */
 .cd-digit {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
+
+/* ── Hide scrollbar while keeping scroll ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
