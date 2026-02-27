@@ -28,7 +28,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#080B14',
+  themeColor: '#000000',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans antialiased bg-bg text-text">
         <main
           className="min-h-dvh"
-          style={{ paddingBottom: 'calc(52px + env(safe-area-inset-bottom) + 12px)' }}
+          style={{ paddingBottom: 'calc(50px + env(safe-area-inset-bottom) + 16px)' }}
         >
           {children}
         </main>

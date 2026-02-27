@@ -5,47 +5,47 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ────────────────────────────────────────────────
-   Midnight Luxury — always-dark design system
-   Mapped to shadcn CSS-variable conventions
+   Apple HIG–inspired dark mode design tokens
+   Always-dark — no .dark class needed
    ──────────────────────────────────────────────── */
 :root {
-  --radius: 0.75rem;
+  --radius: 0.625rem;            /* 10px — iOS grouped card radius */
 
-  /* Surface hierarchy */
-  --background:           #09090B;
-  --foreground:           #F4F4F5;
-  --card:                 #141418;
-  --card-foreground:      #F4F4F5;
-  --popover:              #1A1A1E;
-  --popover-foreground:   #F4F4F5;
+  /* Surface hierarchy (iOS dark mode) */
+  --background:           #000000;   /* systemBackground */
+  --foreground:           #FFFFFF;   /* label */
+  --card:                 #1C1C1E;   /* secondarySystemBackground */
+  --card-foreground:      #FFFFFF;
+  --popover:              #2C2C2E;   /* tertiarySystemBackground */
+  --popover-foreground:   #FFFFFF;
 
   /* Brand accent — warm amber */
   --primary:              #F59E0B;
-  --primary-foreground:   #0C0C0E;
+  --primary-foreground:   #000000;
 
   /* Secondary / muted surfaces */
-  --secondary:            #1E1E23;
-  --secondary-foreground: #F4F4F5;
-  --muted:                #1E1E23;
-  --muted-foreground:     #71717A;
+  --secondary:            #2C2C2E;   /* tertiarySystemBackground */
+  --secondary-foreground: #FFFFFF;
+  --muted:                #2C2C2E;
+  --muted-foreground:     #8E8E93;   /* secondaryLabel */
 
   /* Hover accent surface */
-  --accent:               #28282E;
-  --accent-foreground:    #F4F4F5;
+  --accent:               #3A3A3C;   /* systemGray3 */
+  --accent-foreground:    #FFFFFF;
 
   /* Destructive */
-  --destructive:          #F87171;
-  --destructive-foreground: #0C0C0E;
+  --destructive:          #FF453A;   /* systemRed */
+  --destructive-foreground: #FFFFFF;
 
   /* Structure */
-  --border:               #2C2C33;
-  --input:                #2C2C33;
+  --border:               #38383A;   /* separator */
+  --input:                #3A3A3C;
   --ring:                 #F59E0B;
 
   /* Data-vis palette */
   --chart-1:  #F59E0B;
   --chart-2:  #2DD4BF;
-  --chart-3:  #F87171;
+  --chart-3:  #FF453A;
   --chart-4:  #7C83FD;
   --chart-5:  #FF7EB3;
 }
@@ -53,7 +53,7 @@
 /* ── Tailwind v4 token mapping ── */
 @theme inline {
   /* Fonts */
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-dm-mono), 'DM Mono', system-ui, ui-monospace, monospace;
 
   /* shadcn → Tailwind utilities */
@@ -83,12 +83,11 @@
   --radius-2xl: calc(var(--radius) + 8px);
 }
 
-/* ── App-specific aliases (keep existing class names working) ── */
+/* ── App-specific aliases ── */
 @theme {
   --color-bg:       var(--background);
   --color-surface:  var(--card);
   --color-surface2: var(--secondary);
-  /* border and muted come from @theme inline above */
   --color-gold:     var(--primary);
   --color-gold2:    #D97706;
   --color-teal:     #2DD4BF;
@@ -112,6 +111,8 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   height: 100%;
 }
 
@@ -122,12 +123,14 @@ body {
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
   font-feature-settings: 'cv11', 'ss01';
+  font-size: 15px;                          /* iOS body default */
+  line-height: 1.47;                        /* iOS body line-height */
 }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #3F3F46; border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: #48484A; border-radius: 99px; }
 
 /* ── Touch ── */
 button, a, [role="button"] { touch-action: manipulation; }
@@ -137,11 +140,11 @@ button, a, [role="button"] { touch-action: manipulation; }
   background: linear-gradient(90deg, var(--secondary) 25%, var(--border) 50%, var(--secondary) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 /* ── Tabular numbers ── */
-.cd-digit {
+.tnum {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
