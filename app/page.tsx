@@ -40,7 +40,7 @@ function greeting() {
 /* ── Section label ── */
 function SectionLabel({ label, href }: { label: string; href?: string }) {
   return (
-    <div className="flex items-center justify-between mb-2.5">
+    <div className="flex items-center justify-between mb-3">
       <p className="text-[11px] text-muted-foreground uppercase tracking-[0.1em] font-medium">{label}</p>
       {href && (
         <Link href={href} className="flex items-center gap-0.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors">
@@ -51,19 +51,23 @@ function SectionLabel({ label, href }: { label: string; href?: string }) {
   );
 }
 
-/* ── Compact weather row ── */
-function WeatherRow({ w }: { w: WeatherData }) {
+/* ── Weather card (2-line) ── */
+function WeatherCard({ w }: { w: WeatherData }) {
   const info = weatherInfo(w.code);
   return (
     <Card>
-      <CardContent className="flex items-center gap-3 px-4 py-3">
-        <span className="text-2xl leading-none">{info.emoji}</span>
-        <span className="font-mono text-xl font-bold leading-none">{w.temp}°C</span>
-        <span className="text-sm text-muted-foreground flex-1">{info.label}</span>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1"><Droplets size={10} />{w.humidity}%</span>
-          <span className="flex items-center gap-1"><Wind size={10} />{w.windSpeed} km/h</span>
-          <span className="opacity-50">{w.location}</span>
+      <CardContent className="flex items-center gap-4 p-4">
+        <span className="text-3xl leading-none shrink-0">{info.emoji}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2">
+            <span className="font-mono text-xl font-bold">{w.temp}°C</span>
+            <span className="text-sm text-muted-foreground">{info.label}</span>
+          </div>
+          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1"><Droplets size={11} /> {w.humidity}%</span>
+            <span className="flex items-center gap-1"><Wind size={11} /> {w.windSpeed} km/h</span>
+            <span className="flex items-center gap-1"><MapPin size={11} /> {w.location}</span>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -133,11 +137,11 @@ export default function TodayPage() {
   const poolPct    = stats ? Math.max(0, Math.min(100, Math.round(stats.remaining / TOTAL_CASH * 100))) : 0;
 
   return (
-    <div className="max-w-lg mx-auto px-4 pt-10 space-y-8">
+    <div className="max-w-lg mx-auto px-5 pt-12 space-y-7">
 
       {/* ── Greeting header ── */}
       <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-[28px] font-bold tracking-tight leading-tight">{greeting()}</h1>
+        <h1 className="text-2xl font-bold tracking-tight leading-tight">{greeting()}</h1>
         {isPreTrip && diff && (
           <p className="text-muted-foreground text-sm mt-1.5">
             {diff.d === 0 ? 'Flight day — pack your bags.' :
@@ -159,16 +163,23 @@ export default function TodayPage() {
           initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
         >
           <SectionLabel label="Countdown to departure" />
-          <div className="flex items-baseline gap-0.5">
-            <span className="font-mono text-[48px] font-semibold text-foreground leading-none cd-digit">{pad(diff.d)}</span>
-            <span className="text-muted-foreground text-base mb-1 ml-1 mr-4">d</span>
-            <span className="font-mono text-[48px] font-semibold text-foreground leading-none cd-digit">{pad(diff.h)}</span>
-            <span className="text-muted-foreground text-base mb-1 ml-1 mr-4">h</span>
-            <span className="font-mono text-[48px] font-semibold text-foreground leading-none cd-digit">{pad(diff.m)}</span>
-            <span className="text-muted-foreground text-base mb-1 ml-1 mr-4">m</span>
-            <span className="font-mono text-[48px] font-semibold text-foreground leading-none cd-digit">{pad(diff.s)}</span>
-            <span className="text-muted-foreground text-base mb-1 ml-1">s</span>
-          </div>
+          <Card>
+            <CardContent className="py-5 px-5">
+              <div className="flex items-baseline justify-center gap-1">
+                {[
+                  { val: pad(diff.d), unit: 'd' },
+                  { val: pad(diff.h), unit: 'h' },
+                  { val: pad(diff.m), unit: 'm' },
+                  { val: pad(diff.s), unit: 's' },
+                ].map(({ val, unit }) => (
+                  <div key={unit} className="flex items-baseline">
+                    <span className="font-mono text-[38px] font-semibold text-foreground leading-none cd-digit">{val}</span>
+                    <span className="text-muted-foreground text-sm ml-1 mr-3 last:mr-0">{unit}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
       )}
 
@@ -185,12 +196,12 @@ export default function TodayPage() {
             <SectionLabel label="Up next" />
             <Card className="overflow-hidden">
               <div className="h-0.5 bg-gradient-to-r from-teal/70 via-teal/20 to-transparent" />
-              <CardContent className="p-4">
+              <CardContent className="p-5">
                 <div className="flex items-start gap-3">
                   <span className="text-2xl leading-none">{next.emoji}</span>
                   <div>
                     <p className="font-semibold text-sm">{next.label}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {next.time}{next.note ? ` · ${next.note}` : ''}
                     </p>
                   </div>
@@ -213,8 +224,8 @@ export default function TodayPage() {
       <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <SectionLabel label="Weather" />
         {weather
-          ? <WeatherRow w={weather} />
-          : <div className="skeleton h-[52px] rounded-2xl" />
+          ? <WeatherCard w={weather} />
+          : <div className="skeleton h-[72px] rounded-2xl" />
         }
       </motion.div>
 
@@ -224,47 +235,47 @@ export default function TodayPage() {
         <Link href="/expenses">
           <Card className="overflow-hidden hover:border-teal/40 transition-colors cursor-pointer">
             <div className="h-0.5 bg-gradient-to-r from-teal/80 via-teal/25 to-transparent" />
-            <CardContent className="p-4">
+            <CardContent className="p-5">
 
               {/* Hero number */}
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-[11px] text-muted-foreground uppercase tracking-[0.08em] mb-1.5">Pool remaining</p>
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-[0.08em] mb-2">Pool remaining</p>
                   {stats
-                    ? <p className="font-mono text-[34px] font-bold text-teal leading-none">{fmtBaht(stats.remaining)}</p>
-                    : <div className="skeleton h-9 w-32 rounded mt-0.5" />
+                    ? <p className="font-mono text-[32px] font-bold text-teal leading-none">{fmtBaht(stats.remaining)}</p>
+                    : <div className="skeleton h-8 w-32 rounded" />
                   }
                 </div>
-                <Badge variant="outline" className="text-teal border-teal/30 font-mono shrink-0">
+                <Badge variant="outline" className="text-teal border-teal/30 font-mono shrink-0 mt-1">
                   {stats ? `${poolPct}%` : '···'}
                 </Badge>
               </div>
 
               {/* Progress bar */}
-              <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-4">
+              <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-5">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{ width: `${poolPct}%`, background: 'linear-gradient(90deg, #2DD4BF 0%, #0EA5E9 100%)' }}
                 />
               </div>
 
-              <Separator className="mb-3" />
+              <Separator className="mb-4" />
 
               {/* 3 inline stats */}
-              <div className="grid grid-cols-3 text-center">
-                <div className="pr-2">
-                  <p className="text-[10px] text-muted-foreground mb-1">Total pool</p>
-                  <p className="font-mono text-sm font-semibold">{fmtBaht(TOTAL_CASH)}</p>
+              <div className="grid grid-cols-3 text-center gap-2">
+                <div>
+                  <p className="text-[10px] text-muted-foreground mb-1.5">Total pool</p>
+                  <p className="font-mono text-[13px] font-semibold">{fmtBaht(TOTAL_CASH)}</p>
                 </div>
-                <div className="border-x border-border px-2">
-                  <p className="text-[10px] text-muted-foreground mb-1">Cash spent</p>
-                  <p className={`font-mono text-sm font-semibold ${stats?.spent ? 'text-primary' : 'text-muted-foreground'}`}>
+                <div className="border-x border-border">
+                  <p className="text-[10px] text-muted-foreground mb-1.5">Cash spent</p>
+                  <p className={`font-mono text-[13px] font-semibold ${stats?.spent ? 'text-primary' : 'text-muted-foreground'}`}>
                     {stats ? fmtBaht(stats.spent) : '—'}
                   </p>
                 </div>
-                <div className="pl-2">
-                  <p className="text-[10px] text-muted-foreground mb-1">Split total</p>
-                  <p className="font-mono text-sm font-semibold">
+                <div>
+                  <p className="text-[10px] text-muted-foreground mb-1.5">Split total</p>
+                  <p className="font-mono text-[13px] font-semibold">
                     {stats ? fmtBaht(stats.splitTotal) : '—'}
                   </p>
                 </div>
@@ -282,46 +293,46 @@ export default function TodayPage() {
           <a href={nextFlight.fr24} target="_blank" rel="noopener noreferrer">
             <Card className="overflow-hidden hover:border-primary/40 transition-colors cursor-pointer">
               <div className="h-0.5 bg-gradient-to-r from-primary/80 via-primary/25 to-transparent" />
-              <CardContent className="p-4">
+              <CardContent className="p-5">
 
                 {/* Airline row */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
-                      <Plane size={14} className="text-amber-400" />
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
+                      <Plane size={15} className="text-amber-400" />
                     </div>
                     <div>
                       <p className="font-mono text-sm font-bold text-primary leading-none">{nextFlight.flight}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{nextFlight.airline}</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">{nextFlight.airline}</p>
                     </div>
                   </div>
                   <Badge variant="outline" className="text-teal border-teal/30 text-[10px]">Track live ↗</Badge>
                 </div>
 
                 {/* Route display */}
-                <div className="flex items-center mb-3">
+                <div className="flex items-center mb-4">
                   <div className="flex-1">
-                    <p className="font-mono text-[30px] font-bold leading-none">{nextFlight.from}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{nextFlight.fromFull}</p>
+                    <p className="font-mono text-[28px] font-bold leading-none">{nextFlight.from}</p>
+                    <p className="text-xs text-muted-foreground mt-1.5">{nextFlight.fromFull}</p>
                   </div>
-                  <div className="flex items-center gap-1.5 px-3 text-muted-foreground shrink-0">
-                    <div className="h-px w-5 bg-border" />
-                    <Plane size={11} />
-                    <div className="h-px w-5 bg-border" />
+                  <div className="flex items-center gap-2 px-4 text-muted-foreground shrink-0">
+                    <div className="h-px w-6 bg-border" />
+                    <Plane size={12} />
+                    <div className="h-px w-6 bg-border" />
                   </div>
                   <div className="flex-1 text-right">
-                    <p className="font-mono text-[30px] font-bold leading-none">{nextFlight.to}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{nextFlight.toFull}</p>
+                    <p className="font-mono text-[28px] font-bold leading-none">{nextFlight.to}</p>
+                    <p className="text-xs text-muted-foreground mt-1.5">{nextFlight.toFull}</p>
                   </div>
                 </div>
 
                 {/* Times */}
-                <div className="flex flex-wrap gap-x-3 text-[11px] text-muted-foreground">
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                   <span>{nextFlight.depLocal} → {nextFlight.arrLocal.split(', ')[1]}</span>
                   <span>PNR: {nextFlight.pnr}</span>
                 </div>
-                {nextFlight.note && <p className="mt-1 text-[11px] text-teal/80">{nextFlight.note}</p>}
-                {'warn' in nextFlight && nextFlight.warn && <p className="mt-1 text-[11px] text-destructive/80">{nextFlight.warn}</p>}
+                {nextFlight.note && <p className="mt-1.5 text-xs text-teal/80">{nextFlight.note}</p>}
+                {'warn' in nextFlight && nextFlight.warn && <p className="mt-1.5 text-xs text-destructive/80">{nextFlight.warn}</p>}
 
               </CardContent>
             </Card>
@@ -333,11 +344,11 @@ export default function TodayPage() {
       {tripDay && dayData && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <SectionLabel label="Today's schedule" href="/itinerary" />
-          <Card className="overflow-hidden p-0">
+          <Card className="overflow-hidden">
             {dayData.activities.map((act, i) => {
               const past = act.time < now.toTimeString().slice(0, 5);
               return (
-                <div key={i} className={`flex items-start gap-3 px-4 py-2.5 ${i > 0 ? 'border-t border-border' : ''}`}>
+                <div key={i} className={`flex items-start gap-3 px-5 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
                   <span className="font-mono text-xs text-muted-foreground w-10 pt-0.5 shrink-0">{act.time}</span>
                   <span className="text-lg leading-none shrink-0 mt-0.5">{act.emoji}</span>
                   <div className="flex-1 min-w-0">
@@ -356,7 +367,7 @@ export default function TodayPage() {
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="overflow-hidden border-primary/30">
             <div className="h-0.5 bg-gradient-to-r from-primary/80 via-primary/25 to-transparent" />
-            <CardContent className="p-4 space-y-3">
+            <CardContent className="p-5 space-y-3">
               <p className="font-semibold">Time to settle up!</p>
               <p className="text-sm text-muted-foreground">See who owes who and close it out.</p>
               <Link
@@ -376,13 +387,13 @@ export default function TodayPage() {
         <div className="grid grid-cols-2 gap-3">
           {QUICK_LINKS.map(({ href, icon: Icon, label, sub, iconBg, iconColor, hoverBorder }) => (
             <Link key={href} href={href}>
-              <Card className={`flex flex-col gap-3 p-4 ${hoverBorder} active:bg-secondary transition-colors cursor-pointer h-full`}>
-                <div className={`w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center`}>
-                  <Icon size={17} className={iconColor} />
+              <Card className={`flex flex-col gap-3 p-5 ${hoverBorder} active:bg-secondary transition-colors cursor-pointer h-full`}>
+                <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center`}>
+                  <Icon size={18} className={iconColor} />
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{label}</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{sub}</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">{sub}</p>
                 </div>
               </Card>
             </Link>
@@ -391,11 +402,11 @@ export default function TodayPage() {
       </motion.div>
 
       {/* ── Crew ── */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.26 }} className="pb-2">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.26 }} className="pb-4">
         <SectionLabel label={`The crew · ${MEMBERS.length}`} />
         <div className="flex gap-2 flex-wrap">
           {MEMBERS.map((m, i) => (
-            <div key={m} className="flex items-center gap-1.5 bg-card border border-border rounded-full px-2.5 py-1">
+            <div key={m} className="flex items-center gap-2 bg-card border border-border rounded-full px-3 py-1.5">
               <div
                 className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
                 style={{ background: `${MEMBER_COLORS[i]}22`, color: MEMBER_COLORS[i] }}
