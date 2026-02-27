@@ -5,20 +5,30 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 import { ITINERARY_DAYS } from '@/lib/constants';
 import { getTripDay } from '@/lib/utils';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 const TYPE_COLORS: Record<string, string> = {
-  transit:       'bg-blue-500/15 text-blue-300 border-blue-500/20',
-  food:          'bg-orange-500/15 text-orange-300 border-orange-500/20',
-  activity:      'bg-teal/15 text-teal border-teal/20',
-  stay:          'bg-purple-500/15 text-purple-300 border-purple-500/20',
-  nightlife:     'bg-pink-500/15 text-pink-300 border-pink-500/20',
+  transit:   'bg-blue-500/15 text-blue-300 border-blue-500/25',
+  food:      'bg-orange-500/15 text-orange-300 border-orange-500/25',
+  activity:  'bg-teal/15 text-teal border-teal/25',
+  stay:      'bg-purple-500/15 text-purple-300 border-purple-500/25',
+  nightlife: 'bg-pink-500/15 text-pink-300 border-pink-500/25',
+};
+
+const TYPE_DOT: Record<string, string> = {
+  transit:   'border-blue-400 bg-blue-400/30',
+  food:      'border-orange-400 bg-orange-400/30',
+  activity:  'border-teal bg-teal/30',
+  stay:      'border-purple-400 bg-purple-400/30',
+  nightlife: 'border-pink-400 bg-pink-400/30',
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  transit: 'Flight / Transfer',
-  food: 'Food & Drinks',
-  activity: 'Activity',
-  stay: 'Accommodation',
+  transit:   'Transfer',
+  food:      'Food',
+  activity:  'Activity',
+  stay:      'Stay',
   nightlife: 'Nightlife',
 };
 
@@ -34,11 +44,11 @@ export default function ItineraryPage() {
       {/* Header */}
       <div className="px-4 pt-6 pb-3">
         <h1 className="text-xl font-bold">Itinerary</h1>
-        <p className="text-sm text-muted mt-0.5">Feb 28 – Mar 4, 2026 · Phuket & Bangkok</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Feb 28 – Mar 4, 2026 · Phuket & Bangkok</p>
       </div>
 
       {/* Day selector */}
-      <div className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide no-scrollbar">
+      <div className="flex gap-2 overflow-x-auto px-4 pb-3 no-scrollbar">
         {ITINERARY_DAYS.map(d => {
           const isActive  = d.day === activeDay;
           const isToday   = d.day === todayTrip;
@@ -49,8 +59,8 @@ export default function ItineraryPage() {
               onClick={() => setActiveDay(d.day)}
               className={`flex flex-col items-center shrink-0 rounded-2xl px-4 py-2.5 border transition-all ${
                 isActive
-                  ? 'bg-gold border-gold text-bg font-semibold'
-                  : 'bg-surface border-border text-muted hover:border-gold/40'
+                  ? 'bg-primary border-primary text-primary-foreground font-semibold'
+                  : 'bg-card border-border text-muted-foreground hover:border-primary/40'
               }`}
             >
               <span className="text-[10px] uppercase tracking-wide">
@@ -73,20 +83,22 @@ export default function ItineraryPage() {
           className="px-4 space-y-3"
         >
           {/* Day header */}
-          <div className="bg-surface border border-border rounded-2xl p-4">
-            <h2 className="font-bold text-lg leading-tight">{day.title}</h2>
-            <p className="text-sm text-muted flex items-center gap-1 mt-1">
-              <MapPin size={12} className="shrink-0" /> {day.location}
-            </p>
-          </div>
+          <Card>
+            <CardContent className="p-4">
+              <h2 className="font-bold text-lg leading-tight">{day.title}</h2>
+              <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                <MapPin size={12} className="shrink-0" /> {day.location}
+              </p>
+            </CardContent>
+          </Card>
 
           {/* Timeline */}
           <div className="relative">
-            {/* Vertical line */}
             <div className="absolute left-[2.1rem] top-3 bottom-3 w-px bg-border" />
 
             <div className="space-y-1">
               {day.activities.map((act, i) => {
+                const dotClass   = TYPE_DOT[act.type]   ?? TYPE_DOT.activity;
                 const colorClass = TYPE_COLORS[act.type] ?? TYPE_COLORS.activity;
                 return (
                   <motion.div
@@ -98,31 +110,31 @@ export default function ItineraryPage() {
                   >
                     {/* Time */}
                     <div className="w-16 text-right shrink-0 pt-3">
-                      <span className="font-mono text-xs text-muted">{act.time}</span>
+                      <span className="font-mono text-xs text-muted-foreground">{act.time}</span>
                     </div>
 
                     {/* Dot */}
                     <div className="relative z-10 mt-3.5 shrink-0">
-                      <div className={`w-3 h-3 rounded-full border-2 ${
-                        act.type === 'transit' ? 'border-blue-400 bg-blue-400/30' :
-                        act.type === 'food'    ? 'border-orange-400 bg-orange-400/30' :
-                        act.type === 'nightlife' ? 'border-pink-400 bg-pink-400/30' :
-                        act.type === 'stay'    ? 'border-purple-400 bg-purple-400/30' :
-                        'border-teal bg-teal/30'
-                      }`} />
+                      <div className={`w-3 h-3 rounded-full border-2 ${dotClass}`} />
                     </div>
 
-                    {/* Card */}
+                    {/* Activity card */}
                     <div className={`flex-1 mb-2 rounded-xl border p-3 ${colorClass}`}>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start gap-2 flex-1">
-                          <span className="text-lg leading-none mt-0.5">{act.emoji}</span>
-                          <div>
-                            <p className="font-medium text-sm text-text leading-snug">{act.label}</p>
-                            {act.note && (
-                              <p className="text-xs opacity-70 mt-0.5">{act.note}</p>
-                            )}
+                      <div className="flex items-start gap-2">
+                        <span className="text-lg leading-none mt-0.5 shrink-0">{act.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-medium text-sm text-foreground leading-snug">{act.label}</p>
+                            <Badge
+                              variant="outline"
+                              className={`shrink-0 text-[9px] py-0 px-1.5 h-auto ${colorClass}`}
+                            >
+                              {TYPE_LABELS[act.type] ?? 'Activity'}
+                            </Badge>
                           </div>
+                          {act.note && (
+                            <p className="text-xs opacity-70 mt-0.5">{act.note}</p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -131,7 +143,6 @@ export default function ItineraryPage() {
               })}
             </div>
           </div>
-
 
         </motion.div>
       </AnimatePresence>

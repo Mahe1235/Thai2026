@@ -1,4 +1,11 @@
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 import { MEMBERS, MEMBER_COLORS, type Member } from './constants';
+
+/** shadcn utility — merges Tailwind classes safely */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export function fmt(n: number): string {
   return Math.abs(n).toLocaleString('en-IN');
@@ -14,10 +21,6 @@ export function memberColor(name: string): string {
 
 export function memberInitial(name: string): string {
   return name?.[0]?.toUpperCase() ?? '?';
-}
-
-export function cn(...classes: (string | undefined | false | null)[]): string {
-  return classes.filter(Boolean).join(' ');
 }
 
 /** Get today's trip day (1-5), or null if outside trip */

@@ -16,42 +16,44 @@ export default function BottomNav() {
   const path = usePathname();
 
   return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-50 flex"
-      style={{
-        background: 'rgba(9,9,11,0.92)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        height: 'calc(4rem + env(safe-area-inset-bottom))',
-      }}
+    <div
+      className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
+      style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
     >
-      {TABS.map(({ href, icon: Icon, label }) => {
-        const active = href === '/' ? path === '/' : path.startsWith(href);
-        return (
-          <Link
-            key={href}
-            href={href}
-            className="flex flex-1 flex-col items-center justify-center gap-0.5 py-1 relative"
-          >
-            <div className={`flex items-center justify-center w-11 h-7 rounded-2xl transition-all duration-200 ${
-              active ? 'bg-amber-500/12' : ''
-            }`}>
+      <nav
+        className="flex items-center gap-0.5 px-2 py-1.5 rounded-full pointer-events-auto"
+        style={{
+          background: 'rgba(16,16,18,0.97)',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          boxShadow: '0 0 0 1px rgba(255,255,255,0.07), 0 8px 40px rgba(0,0,0,0.7)',
+        }}
+      >
+        {TABS.map(({ href, icon: Icon, label }) => {
+          const active = href === '/' ? path === '/' : path.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className="relative flex flex-col items-center justify-center gap-0.5 px-[18px] py-2.5 rounded-full transition-all duration-200"
+            >
+              {active && (
+                <span className="absolute inset-0 bg-white/[0.09] rounded-full" />
+              )}
               <Icon
                 size={20}
-                className={active ? 'text-gold' : 'text-muted'}
-                strokeWidth={active ? 2.2 : 1.7}
+                className={`relative z-10 transition-colors ${active ? 'text-white' : 'text-zinc-500'}`}
+                strokeWidth={active ? 2 : 1.7}
               />
-            </div>
-            <span className={`text-[10px] tracking-wide transition-colors ${
-              active ? 'text-gold font-semibold' : 'text-muted font-medium'
-            }`}>
-              {label}
-            </span>
-          </Link>
-        );
-      })}
-    </nav>
+              <span className={`relative z-10 text-[9px] tracking-wide transition-colors ${
+                active ? 'text-white font-medium' : 'text-zinc-600'
+              }`}>
+                {label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
   );
 }

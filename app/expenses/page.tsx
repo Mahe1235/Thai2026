@@ -7,6 +7,9 @@ import { db } from '@/lib/supabase';
 import type { CashTransaction, SplitExpense, Settlement } from '@/lib/supabase';
 import { MEMBERS, TOTAL_CASH, EXPENSE_CATEGORIES, MEMBER_COLORS } from '@/lib/constants';
 import { fmtBaht, memberColor, computeSplitBalances, simplifyDebts } from '@/lib/utils';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 type Tab = 'pool' | 'split';
 
@@ -66,7 +69,7 @@ function AddSheet({ tab, onClose, onSave }: {
       <motion.div
         initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-        className="relative w-full max-w-lg mx-auto bg-surface border border-border rounded-t-3xl p-5 space-y-4"
+        className="relative w-full max-w-lg mx-auto bg-card border border-border rounded-t-3xl p-5 space-y-4"
         onClick={e => e.stopPropagation()}
         style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
       >
@@ -242,15 +245,15 @@ function PoolTab() {
   return (
     <div className="space-y-4">
       {/* Balance card */}
-      <div className="bg-surface border border-border rounded-2xl p-4 space-y-3">
+      <Card className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-muted uppercase tracking-widest">Pool Remaining</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-widest">Pool Remaining</p>
             <p className="font-mono text-2xl font-bold text-teal mt-0.5">{fmtBaht(remaining)}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-muted">of {fmtBaht(TOTAL_CASH)}</p>
-            <p className="font-mono text-sm text-gold mt-0.5">{fmtBaht(spent)} spent</p>
+            <p className="text-xs text-muted-foreground">of {fmtBaht(TOTAL_CASH)}</p>
+            <p className="font-mono text-sm text-primary mt-0.5">{fmtBaht(spent)} spent</p>
           </div>
         </div>
         {/* Progress bar */}
@@ -265,17 +268,17 @@ function PoolTab() {
         </div>
         <div className="grid grid-cols-3 gap-2 pt-1">
           {[
-            { label: 'Total pool', val: fmtBaht(TOTAL_CASH), color: 'text-text' },
-            { label: 'Spent', val: fmtBaht(spent), color: 'text-red' },
-            { label: 'Distributed', val: fmtBaht(distributed), color: 'text-muted' },
+            { label: 'Total pool', val: fmtBaht(TOTAL_CASH), color: 'text-foreground' },
+            { label: 'Spent', val: fmtBaht(spent), color: 'text-destructive' },
+            { label: 'Distributed', val: fmtBaht(distributed), color: 'text-muted-foreground' },
           ].map(s => (
             <div key={s.label} className="text-center">
               <div className={`font-mono text-sm font-bold ${s.color}`}>{s.val}</div>
-              <div className="text-[10px] text-muted mt-0.5">{s.label}</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">{s.label}</div>
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Transactions */}
       <div>
@@ -364,14 +367,14 @@ function SplitTab() {
     <div className="space-y-4">
 
       {/* Summary */}
-      <div className="bg-surface border border-border rounded-2xl p-4">
-        <p className="text-xs text-muted uppercase tracking-widest mb-3">Balances</p>
+      <Card className="p-4">
+        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-3">Balances</p>
         {loading && <div className="skeleton h-32 rounded-xl" />}
         {!loading && (
           <div className="space-y-2">
             {MEMBERS.map(m => {
               const bal = balances[m] ?? 0;
-              const color = bal > 0.5 ? '#00C9A7' : bal < -0.5 ? '#FF5F6D' : '#6B7280';
+              const color = bal > 0.5 ? 'var(--color-teal,#2DD4BF)' : bal < -0.5 ? '#FF5F6D' : '#6B7280';
               return (
                 <div key={m} className="flex items-center gap-3">
                   <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
@@ -385,7 +388,7 @@ function SplitTab() {
                         {bal > 0.5 ? '+' : ''}{fmtBaht(Math.round(bal))}
                       </span>
                     </div>
-                    <div className="h-1.5 bg-surface2 rounded-full mt-1 overflow-hidden">
+                    <div className="h-1.5 bg-secondary rounded-full mt-1 overflow-hidden">
                       {Math.abs(bal) > 0.5 && (
                         <div
                           className="h-full rounded-full"
@@ -403,7 +406,7 @@ function SplitTab() {
             })}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Who owes who */}
       {!loading && debts.length > 0 && (
@@ -505,12 +508,13 @@ export default function ExpensesPage() {
             <h1 className="text-xl font-bold">Expenses</h1>
             <p className="text-sm text-muted mt-0.5">Pool · Split · Balances</p>
           </div>
-          <button
+          <Button
             onClick={() => setShowAdd(true)}
-            className="flex items-center gap-1.5 bg-gold text-bg font-semibold text-sm rounded-xl px-4 py-2"
+            size="sm"
+            className="gap-1.5 rounded-xl"
           >
             <Plus size={16} /> Add
-          </button>
+          </Button>
         </div>
 
         {/* Tabs */}
