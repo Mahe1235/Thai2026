@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans antialiased bg-bg text-text">
         <main
           className="min-h-dvh"
-          style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
+          style={{ paddingBottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}
         >
           {children}
         </main>

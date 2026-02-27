@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   Plane, Wind, Droplets, CalendarDays, ReceiptText,
-  ChevronRight, MapPin, FolderOpen,
+  MapPin, FolderOpen,
 } from 'lucide-react';
 import { db } from '@/lib/supabase';
 import { fetchWeather, weatherInfo } from '@/lib/weather';
@@ -27,21 +27,29 @@ function getDiff(target: Date) {
   };
 }
 function pad(n: number) { return String(n).padStart(2, '0'); }
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning.';
+  if (h < 17) return 'Good afternoon.';
+  return 'Good evening.';
+}
 
-/* ── Countdown digit ── */
-function Digit({ val, label }: { val: string; label: string }) {
+/* ── Section label ── */
+function SectionLabel({ label, href }: { label: string; href?: string }) {
   return (
-    <div className="flex flex-col items-center gap-1.5">
-      <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl w-[60px] h-[60px] flex items-center justify-center">
-        <span className="font-mono text-[26px] font-bold text-gold cd-digit leading-none">{val}</span>
-      </div>
-      <span className="text-[9px] text-white/40 uppercase tracking-[0.12em]">{label}</span>
+    <div className="flex items-center justify-between mb-2.5">
+      <p className="text-[11px] text-zinc-500 uppercase tracking-[0.1em] font-medium">{label}</p>
+      {href && (
+        <Link href={href} className="text-[11px] text-zinc-500 hover:text-white transition-colors">
+          See all
+        </Link>
+      )}
     </div>
   );
 }
 
-/* ── Weather pill ── */
-function WeatherPill({ w }: { w: WeatherData }) {
+/* ── Weather card ── */
+function WeatherCard({ w }: { w: WeatherData }) {
   const info = weatherInfo(w.code);
   return (
     <div className="flex items-center gap-3 bg-surface border border-border rounded-2xl p-4">
@@ -103,96 +111,57 @@ export default function TodayPage() {
   const diff       = isPreTrip ? getDiff(TRIP.departure) : null;
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="max-w-lg mx-auto px-4 pt-10 space-y-8">
 
-      {/* ═══ HERO ═══ */}
-      <div
-        className="relative overflow-hidden px-5 pt-12 pb-9"
-        style={{ background: 'linear-gradient(165deg, #1A0F04 0%, #0D0D0B 55%, #09090B 100%)' }}
-      >
-        {/* Subtle warm noise */}
-        <div className="absolute inset-0 opacity-[0.03]"
-          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundSize: '300px 300px' }}
-        />
-
-        {/* Flag + title */}
-        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="relative">
-          {isPreTrip && (
-            <>
-              <div className="flex items-center gap-3 mb-1">
-                <span className="text-4xl">🇹🇭</span>
-                <div>
-                  <h1 className="text-[28px] font-bold text-white tracking-tight leading-tight">Thailand 2026</h1>
-                  <p className="text-[11px] text-white/40 tracking-[0.12em] uppercase mt-0.5">Feb 28 – Mar 4 · Group of 7</p>
-                </div>
-              </div>
-              <p className="text-sm text-white/60 mt-3 mb-7">
-                {diff?.d === 0 ? '🛫 Today is flight day! Pack your bags.' :
-                 diff?.d === 1 ? '✈️ Departing tomorrow night from BLR!' :
-                 `${diff?.d} day${diff?.d !== 1 ? 's' : ''} until departure from BLR`}
-              </p>
-            </>
-          )}
-          {tripDay && dayData && (
-            <>
-              <div className="inline-flex items-center gap-1.5 bg-gold/20 border border-gold/30 rounded-full px-3 py-1 mb-2">
-                <span className="text-[11px] font-bold text-gold uppercase tracking-wider">Day {tripDay}</span>
-              </div>
-              <h1 className="text-2xl font-bold text-white">{dayData.title}</h1>
-              <p className="text-sm text-white/50 flex items-center gap-1 mt-1 mb-6">
-                <MapPin size={11} /> {dayData.location}
-              </p>
-            </>
-          )}
-          {isPostTrip && (
-            <>
-              <span className="text-3xl">🎉</span>
-              <h1 className="text-2xl font-bold text-white mt-1">Thailand was incredible!</h1>
-              <p className="text-sm text-white/50 mt-1 mb-6">Feb 28 – Mar 4, 2026</p>
-            </>
-          )}
-        </motion.div>
-
-        {/* Countdown */}
+      {/* ── Greeting header ── */}
+      <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}>
+        <h1 className="text-[28px] font-bold tracking-tight leading-tight">{greeting()}</h1>
         {isPreTrip && diff && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.08 }}
-          >
-            <p className="text-[9px] text-white/30 uppercase tracking-[0.14em] text-center mb-4">Countdown to departure</p>
-            <div className="flex justify-center gap-3">
-              <Digit val={pad(diff.d)} label="Days" />
-              <span className="font-mono text-xl text-white/20 self-center pb-5">:</span>
-              <Digit val={pad(diff.h)} label="Hrs" />
-              <span className="font-mono text-xl text-white/20 self-center pb-5">:</span>
-              <Digit val={pad(diff.m)} label="Min" />
-              <span className="font-mono text-xl text-white/20 self-center pb-5">:</span>
-              <Digit val={pad(diff.s)} label="Sec" />
-            </div>
-          </motion.div>
+          <p className="text-muted text-sm mt-1.5">
+            {diff.d === 0 ? 'Flight day — pack your bags.' :
+             diff.d === 1 ? 'Departing tomorrow night from BLR.' :
+             `Thailand in ${diff.d} day${diff.d !== 1 ? 's' : ''}.`}
+          </p>
         )}
-      </div>
+        {tripDay && dayData && (
+          <p className="text-muted text-sm mt-1.5">Day {tripDay} of 5 · {dayData.location}</p>
+        )}
+        {isPostTrip && (
+          <p className="text-muted text-sm mt-1.5">Thailand 2026 — what a trip.</p>
+        )}
+      </motion.div>
 
-      {/* ═══ CONTENT ═══ */}
-      <div className="px-4 pt-5 space-y-5">
+      {/* ── Countdown (pre-trip) ── */}
+      {isPreTrip && diff && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
+        >
+          <SectionLabel label="Countdown to departure" />
+          <div className="flex items-baseline gap-0.5">
+            <span className="font-mono text-[48px] font-semibold text-white leading-none cd-digit">{pad(diff.d)}</span>
+            <span className="text-zinc-600 text-base mb-1 ml-1 mr-4">d</span>
+            <span className="font-mono text-[48px] font-semibold text-white leading-none cd-digit">{pad(diff.h)}</span>
+            <span className="text-zinc-600 text-base mb-1 ml-1 mr-4">h</span>
+            <span className="font-mono text-[48px] font-semibold text-white leading-none cd-digit">{pad(diff.m)}</span>
+            <span className="text-zinc-600 text-base mb-1 ml-1 mr-4">m</span>
+            <span className="font-mono text-[48px] font-semibold text-white leading-none cd-digit">{pad(diff.s)}</span>
+            <span className="text-zinc-600 text-base mb-1 ml-1">s</span>
+          </div>
+        </motion.div>
+      )}
 
-        {/* Weather */}
-        {weather
-          ? <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}><WeatherPill w={weather} /></motion.div>
-          : <div className="skeleton h-[72px] rounded-2xl" />
-        }
-
-        {/* "Up next" during trip */}
-        {tripDay && dayData && (() => {
-          const nowStr   = now.toTimeString().slice(0, 5);
-          const upcoming = dayData.activities.filter(a => a.time >= nowStr);
-          const next     = upcoming[0];
-          if (!next) return null;
-          return (
-            <motion.div
-              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
-              className="bg-surface2 border border-teal/30 rounded-2xl p-4"
-            >
-              <p className="text-[10px] text-teal uppercase tracking-widest mb-2">Up next</p>
+      {/* ── Up next (during trip) ── */}
+      {tripDay && dayData && (() => {
+        const nowStr   = now.toTimeString().slice(0, 5);
+        const upcoming = dayData.activities.filter(a => a.time >= nowStr);
+        const next     = upcoming[0];
+        if (!next) return null;
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
+          >
+            <SectionLabel label="Up next" />
+            <div className="bg-surface border border-teal/20 rounded-2xl p-4">
               <div className="flex items-start gap-3">
                 <span className="text-2xl leading-none">{next.emoji}</span>
                 <div>
@@ -203,25 +172,34 @@ export default function TodayPage() {
                 </div>
               </div>
               {upcoming[1] && (
-                <div className="mt-2.5 pt-2.5 border-t border-border/50 flex items-center gap-2 text-xs text-muted">
+                <div className="mt-3 pt-3 border-t border-border/50 flex items-center gap-2 text-xs text-muted">
                   <span>{upcoming[1].emoji}</span>
                   <span className="font-mono">{upcoming[1].time}</span>
                   <span>—</span>
                   <span>{upcoming[1].label}</span>
                 </div>
               )}
-            </motion.div>
-          );
-        })()}
+            </div>
+          </motion.div>
+        );
+      })()}
 
-        {/* Quick stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-          className="grid grid-cols-3 gap-3"
-        >
+      {/* ── Weather ── */}
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+        <SectionLabel label="Weather" />
+        {weather
+          ? <WeatherCard w={weather} />
+          : <div className="skeleton h-[72px] rounded-2xl" />
+        }
+      </motion.div>
+
+      {/* ── Money ── */}
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>
+        <SectionLabel label="Money" href="/expenses" />
+        <div className="grid grid-cols-3 gap-3">
           {[
-            { label: 'Pool Left',  val: stats ? fmtBaht(stats.remaining) : null, color: 'text-teal'  },
-            { label: 'Pool Spent', val: stats ? fmtBaht(stats.spent)     : null, color: 'text-gold'  },
+            { label: 'Pool left',  val: stats ? fmtBaht(stats.remaining) : null, color: 'text-teal'  },
+            { label: 'Pool spent', val: stats ? fmtBaht(stats.spent)     : null, color: 'text-gold'  },
             { label: 'Split',      val: stats ? fmtBaht(stats.splitTotal): null, color: 'text-text'  },
           ].map(item => (
             <Link key={item.label} href="/expenses"
@@ -234,97 +212,90 @@ export default function TodayPage() {
               <div className="text-[10px] text-muted mt-1 tracking-wide">{item.label}</div>
             </Link>
           ))}
-        </motion.div>
+        </div>
+      </motion.div>
 
-        {/* Next/upcoming flight */}
-        {nextFlight && !isPostTrip && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
+      {/* ── Next flight ── */}
+      {nextFlight && !isPostTrip && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }}>
+          <SectionLabel label={isPreTrip ? 'First flight' : 'Next flight'} />
+          <a href={nextFlight.fr24} target="_blank" rel="noopener noreferrer"
+            className="block bg-surface border border-border hover:border-gold/40 rounded-2xl p-4 transition-colors"
           >
-            <p className="text-[10px] text-muted uppercase tracking-widest mb-2">
-              {isPreTrip ? 'Your first flight' : 'Next flight'}
-            </p>
-            <a href={nextFlight.fr24} target="_blank" rel="noopener noreferrer"
-              className="block bg-surface border border-border hover:border-gold/40 rounded-2xl p-4 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Plane size={13} className="text-gold" />
-                  <span className="font-mono text-sm font-bold text-gold">{nextFlight.flight}</span>
-                  <span className="text-xs text-muted">{nextFlight.airline}</span>
-                </div>
-                <span className="text-[10px] text-teal border border-teal/30 rounded-full px-2.5 py-0.5">Track live ↗</span>
-              </div>
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <div className="text-center">
-                  <div className="font-mono text-xl font-bold">{nextFlight.from}</div>
-                  <div className="text-[11px] text-muted">{nextFlight.fromFull}</div>
-                </div>
-                <div className="flex-1 flex items-center gap-1 px-2">
-                  <div className="flex-1 h-px bg-border" />
-                  <Plane size={12} className="text-muted" />
-                  <div className="flex-1 h-px bg-border" />
-                </div>
-                <div className="text-center">
-                  <div className="font-mono text-xl font-bold">{nextFlight.to}</div>
-                  <div className="text-[11px] text-muted">{nextFlight.toFull}</div>
-                </div>
+                <Plane size={13} className="text-gold" />
+                <span className="font-mono text-sm font-bold text-gold">{nextFlight.flight}</span>
+                <span className="text-xs text-muted">{nextFlight.airline}</span>
               </div>
-              <div className="mt-2.5 flex flex-wrap gap-x-3 text-[11px] text-muted">
-                <span>{nextFlight.depLocal} → {nextFlight.arrLocal.split(', ')[1]}</span>
-                <span>PNR: {nextFlight.pnr}</span>
-              </div>
-              {nextFlight.note && <p className="mt-1 text-[11px] text-teal/80">{nextFlight.note}</p>}
-              {'warn' in nextFlight && nextFlight.warn && <p className="mt-1 text-[11px] text-red/80">{nextFlight.warn}</p>}
-            </a>
-          </motion.div>
-        )}
-
-        {/* Today's schedule (during trip) */}
-        {tripDay && dayData && (
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Link href="/itinerary" className="flex items-center justify-between mb-2">
-              <p className="text-[10px] text-muted uppercase tracking-widest">Today's schedule</p>
-              <span className="text-xs text-gold flex items-center gap-0.5">Full view <ChevronRight size={12} /></span>
-            </Link>
-            <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-              {dayData.activities.map((act, i) => {
-                const past = act.time < now.toTimeString().slice(0, 5);
-                return (
-                  <div key={i} className={`flex items-start gap-3 px-4 py-2.5 ${i > 0 ? 'border-t border-border' : ''}`}>
-                    <span className="font-mono text-xs text-muted w-10 pt-0.5 shrink-0">{act.time}</span>
-                    <span className="text-lg leading-none shrink-0 mt-0.5">{act.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm ${past ? 'text-muted line-through' : ''}`}>{act.label}</p>
-                      {act.note && <p className="text-xs text-muted mt-0.5">{act.note}</p>}
-                    </div>
-                  </div>
-                );
-              })}
+              <span className="text-[10px] text-teal border border-teal/30 rounded-full px-2.5 py-0.5">Track live ↗</span>
             </div>
-          </motion.div>
-        )}
+            <div className="flex items-center gap-2">
+              <div className="text-center">
+                <div className="font-mono text-xl font-bold">{nextFlight.from}</div>
+                <div className="text-[11px] text-muted">{nextFlight.fromFull}</div>
+              </div>
+              <div className="flex-1 flex items-center gap-1 px-2">
+                <div className="flex-1 h-px bg-border" />
+                <Plane size={12} className="text-muted" />
+                <div className="flex-1 h-px bg-border" />
+              </div>
+              <div className="text-center">
+                <div className="font-mono text-xl font-bold">{nextFlight.to}</div>
+                <div className="text-[11px] text-muted">{nextFlight.toFull}</div>
+              </div>
+            </div>
+            <div className="mt-2.5 flex flex-wrap gap-x-3 text-[11px] text-muted">
+              <span>{nextFlight.depLocal} → {nextFlight.arrLocal.split(', ')[1]}</span>
+              <span>PNR: {nextFlight.pnr}</span>
+            </div>
+            {nextFlight.note && <p className="mt-1 text-[11px] text-teal/80">{nextFlight.note}</p>}
+            {'warn' in nextFlight && nextFlight.warn && <p className="mt-1 text-[11px] text-red/80">{nextFlight.warn}</p>}
+          </a>
+        </motion.div>
+      )}
 
-        {/* Post-trip settlement CTA */}
-        {isPostTrip && (
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-            className="bg-surface border border-gold/30 rounded-2xl p-4 space-y-3"
-          >
-            <p className="font-semibold">Time to settle up!</p>
-            <p className="text-sm text-muted">See who owes who and close it out.</p>
-            <Link href="/expenses"
-              className="flex items-center justify-center gap-2 bg-gold text-bg font-semibold text-sm rounded-xl py-2.5 w-full"
-            >
-              <ReceiptText size={15} /> View Balances
-            </Link>
-          </motion.div>
-        )}
+      {/* ── Today's schedule ── */}
+      {tripDay && dayData && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <SectionLabel label="Today's schedule" href="/itinerary" />
+          <div className="bg-surface border border-border rounded-2xl overflow-hidden">
+            {dayData.activities.map((act, i) => {
+              const past = act.time < now.toTimeString().slice(0, 5);
+              return (
+                <div key={i} className={`flex items-start gap-3 px-4 py-2.5 ${i > 0 ? 'border-t border-border' : ''}`}>
+                  <span className="font-mono text-xs text-muted w-10 pt-0.5 shrink-0">{act.time}</span>
+                  <span className="text-lg leading-none shrink-0 mt-0.5">{act.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${past ? 'text-muted line-through' : ''}`}>{act.label}</p>
+                    {act.note && <p className="text-xs text-muted mt-0.5">{act.note}</p>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
 
-        {/* Quick links grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-          className="grid grid-cols-2 gap-3"
+      {/* ── Post-trip settlement ── */}
+      {isPostTrip && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+          className="bg-surface border border-gold/30 rounded-2xl p-4 space-y-3"
         >
+          <p className="font-semibold">Time to settle up!</p>
+          <p className="text-sm text-muted">See who owes who and close it out.</p>
+          <Link href="/expenses"
+            className="flex items-center justify-center gap-2 bg-gold text-bg font-semibold text-sm rounded-xl py-2.5 w-full"
+          >
+            <ReceiptText size={15} /> View Balances
+          </Link>
+        </motion.div>
+      )}
+
+      {/* ── Quick access ── */}
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}>
+        <SectionLabel label="Quick access" />
+        <div className="grid grid-cols-2 gap-3">
           {[
             { href: '/itinerary', icon: CalendarDays, label: 'Itinerary',  sub: '5 days · Phuket & BKK' },
             { href: '/expenses',  icon: ReceiptText,  label: 'Expenses',   sub: '฿70k pool · split' },
@@ -332,34 +303,36 @@ export default function TodayPage() {
             { href: '/places',    icon: MapPin,        label: 'Places',     sub: 'Map · visited list' },
           ].map(({ href, icon: Icon, label, sub }) => (
             <Link key={href} href={href}
-              className="flex flex-col gap-2 bg-surface border border-border rounded-2xl p-4 hover:border-gold/25 active:bg-surface2 transition-colors"
+              className="flex flex-col gap-2.5 bg-surface border border-border rounded-2xl p-4 hover:border-gold/25 active:bg-surface2 transition-colors"
             >
-              <Icon size={18} className="text-gold" />
+              <div className="w-8 h-8 rounded-xl bg-surface2 flex items-center justify-center">
+                <Icon size={16} className="text-gold" />
+              </div>
               <div>
                 <p className="text-sm font-semibold">{label}</p>
                 <p className="text-[11px] text-muted mt-0.5">{sub}</p>
               </div>
             </Link>
           ))}
-        </motion.div>
+        </div>
+      </motion.div>
 
-        {/* Crew */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-          <p className="text-[10px] text-muted uppercase tracking-widest mb-2">The crew · {MEMBERS.length}</p>
-          <div className="flex gap-2 flex-wrap pb-2">
-            {MEMBERS.map((m, i) => (
-              <div key={m} className="flex items-center gap-1.5 bg-surface border border-border rounded-full px-2.5 py-1">
-                <div className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
-                  style={{ background: `${MEMBER_COLORS[i]}22`, color: MEMBER_COLORS[i] }}>
-                  {m[0]}
-                </div>
-                <span className="text-xs">{m}</span>
+      {/* ── Crew ── */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.26 }} className="pb-2">
+        <SectionLabel label={`The crew · ${MEMBERS.length}`} />
+        <div className="flex gap-2 flex-wrap">
+          {MEMBERS.map((m, i) => (
+            <div key={m} className="flex items-center gap-1.5 bg-surface border border-border rounded-full px-2.5 py-1">
+              <div className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+                style={{ background: `${MEMBER_COLORS[i]}22`, color: MEMBER_COLORS[i] }}>
+                {m[0]}
               </div>
-            ))}
-          </div>
-        </motion.div>
+              <span className="text-xs">{m}</span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
 
-      </div>
     </div>
   );
 }
